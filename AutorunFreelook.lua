@@ -370,11 +370,13 @@ frame:SetScript("OnUpdate", function(_, elapsed)
   end
 
   local moving = isMoving()
+  -- Flight paths and vehicles move you without the left stick too; they are not autorun.
+  local passenger = (UnitOnTaxi and UnitOnTaxi("player")) or (UnitInVehicle and UnitInVehicle("player"))
   if autorun then
-    if not moving then
-      leaveAutorun("stopped")
+    if not moving or passenger then
+      leaveAutorun(passenger and "passenger" or "stopped")
     end
-  elseif moving and not InCombatLockdown() then
+  elseif moving and not passenger and not InCombatLockdown() then
     local x, y = leftStick(state)
     if x and math.sqrt(x * x + y * y) < IDLE_LENGTH then
       idleTime = idleTime + dt
