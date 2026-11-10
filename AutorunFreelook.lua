@@ -343,9 +343,8 @@ frame:SetScript("OnUpdate", function(_, elapsed)
     return
   end
 
-  local state = mappedState()
-
   if learning then
+    local state = mappedState()
     if state then
       local buttons, axes = snapshot(state)
       for i in pairs(buttons) do
@@ -371,6 +370,13 @@ frame:SetScript("OnUpdate", function(_, elapsed)
   end
 
   local moving = isMoving()
+  if not (moving or autorun or steering) then
+    -- Standing still outside autorun: nothing to do. Skipping the controller read also avoids
+    -- creating a new state table every poll.
+    idleTime = 0
+    return
+  end
+  local state = mappedState()
   -- Flight paths, vehicles and /follow move you without the left stick too; they are not autorun.
   local passenger = following or (UnitOnTaxi and UnitOnTaxi("player")) or (UnitInVehicle and UnitInVehicle("player"))
   if autorun then
