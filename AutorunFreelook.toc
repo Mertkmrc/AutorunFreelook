@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Autorun Freelook
+## Notes: Look around freely during gamepad autorun and hold R2 to steer with the right stick.
+## Author: NeiNeken
+## Version: 1.0.0
+## SavedVariables: AutorunFreelookDB
+## X-License: MIT
+## X-Website: https://github.com/Mertkmrc/AutorunFreelook
+
+AutorunFreelook.lua
