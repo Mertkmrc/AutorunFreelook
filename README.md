@@ -40,7 +40,7 @@ R2 or L2 work best. L3 stops autorun when pressed, L1 and R1 turn the right stic
 
 ## How it works
 
-- **Autorun detection:** You are moving, out of combat, and not touching the left stick.
+- **Autorun detection:** You are moving, out of combat, and not touching the left stick. Following someone (`/follow`), flight paths and vehicles never count.
 - **Steering:** While you hold the steer button during autorun, the addon sets `GamePadTurnWithCamera` to "always" as a temporary setting that is never saved. Releasing the button removes it.
 - **Left stick lock:** The addon raises the Movement stick deadzone through the gamepad config API (`C_GamePad.SetConfig`). The original config comes back when you stop, enter combat, log out or `/reload`.
 

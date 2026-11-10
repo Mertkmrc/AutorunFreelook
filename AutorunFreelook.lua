@@ -41,6 +41,7 @@ local useTempCVar = C_CVar and C_CVar.SetTempCVar and C_CVar.RemoveTempCVar
 
 local db
 local autorun, steering, locked = false, false, false
+local following = false -- /follow moves you without the left stick, but it is not autorun
 local idleTime = 0
 local learning
 local options -- settings panel, built on PLAYER_LOGIN
@@ -370,11 +371,11 @@ frame:SetScript("OnUpdate", function(_, elapsed)
   end
 
   local moving = isMoving()
-  -- Flight paths and vehicles move you without the left stick too; they are not autorun.
-  local passenger = (UnitOnTaxi and UnitOnTaxi("player")) or (UnitInVehicle and UnitInVehicle("player"))
+  -- Flight paths, vehicles and /follow move you without the left stick too; they are not autorun.
+  local passenger = following or (UnitOnTaxi and UnitOnTaxi("player")) or (UnitInVehicle and UnitInVehicle("player"))
   if autorun then
     if not moving or passenger then
-      leaveAutorun(passenger and "passenger" or "stopped")
+      leaveAutorun(passenger and "follow, flight path or vehicle" or "stopped")
     end
   elseif moving and not passenger and not InCombatLockdown() then
     local x, y = leftStick(state)
@@ -514,8 +515,16 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 frame:RegisterEvent("PLAYER_LOGOUT")
+-- pcall: registering an event this client does not know raises an error.
+pcall(frame.RegisterEvent, frame, "AUTOFOLLOW_BEGIN")
+pcall(frame.RegisterEvent, frame, "AUTOFOLLOW_END")
 frame:SetScript("OnEvent", function(_, event, arg1)
-  if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
+  if event == "AUTOFOLLOW_BEGIN" then
+    following = true
+    leaveAutorun("follow")
+  elseif event == "AUTOFOLLOW_END" then
+    following = false
+  elseif event == "ADDON_LOADED" and arg1 == ADDON_NAME then
     AutorunFreelookDB = AutorunFreelookDB or {}
     db = AutorunFreelookDB
     if db.enabled == nil then
